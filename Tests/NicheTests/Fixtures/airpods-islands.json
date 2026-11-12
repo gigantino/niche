@@ -1,0 +1,318 @@
+{
+    "symbol-55": {
+        "compactLeading": {
+            "font": {
+                "size": 17,
+                "weight": "medium"
+            },
+            "padding": [
+                0,
+                4,
+                0,
+                5
+            ],
+            "systemName": "airpods",
+            "type": "Image"
+        },
+        "compactTrailing": {
+            "frame": {
+                "height": 17.5,
+                "width": 17.5
+            },
+            "padding": [
+                0,
+                8.25,
+                0,
+                5.25
+            ],
+            "progressViewStyle": "circular",
+            "tint": "#7BF1A8",
+            "type": "ProgressView",
+            "value": 0.55
+        },
+        "contentMargins": [
+            {
+                "edges": "leading",
+                "for": "compactLeading",
+                "length": 6
+            },
+            {
+                "edges": "trailing",
+                "for": "compactLeading",
+                "length": 0
+            },
+            {
+                "edges": "leading",
+                "for": "compactTrailing",
+                "length": 0
+            },
+            {
+                "edges": "trailing",
+                "for": "compactTrailing",
+                "length": 6
+            }
+        ],
+        "minimal": {
+            "font": {
+                "size": 17,
+                "weight": "medium"
+            },
+            "padding": [
+                0,
+                4,
+                0,
+                5
+            ],
+            "systemName": "airpods",
+            "type": "Image"
+        }
+    },
+    "symbol-unknown": {
+        "compactLeading": {
+            "font": {
+                "size": 17,
+                "weight": "medium"
+            },
+            "padding": [
+                0,
+                4,
+                0,
+                5
+            ],
+            "systemName": "airpods.max",
+            "type": "Image"
+        },
+        "compactTrailing": {
+            "frame": {
+                "height": 17.5,
+                "width": 17.5
+            },
+            "padding": [
+                0,
+                8.25,
+                0,
+                5.25
+            ],
+            "progressViewStyle": "circular",
+            "tint": "#7BF1A8",
+            "type": "ProgressView",
+            "value": 0
+        },
+        "contentMargins": [
+            {
+                "edges": "leading",
+                "for": "compactLeading",
+                "length": 6
+            },
+            {
+                "edges": "trailing",
+                "for": "compactLeading",
+                "length": 0
+            },
+            {
+                "edges": "leading",
+                "for": "compactTrailing",
+                "length": 0
+            },
+            {
+                "edges": "trailing",
+                "for": "compactTrailing",
+                "length": 6
+            }
+        ],
+        "minimal": {
+            "font": {
+                "size": 17,
+                "weight": "medium"
+            },
+            "padding": [
+                0,
+                4,
+                0,
+                5
+            ],
+            "systemName": "airpods.max",
+            "type": "Image"
+        }
+    },
+    "video-20": {
+        "compactLeading": {
+            "padding": [
+                0,
+                0,
+                2,
+                -1
+            ],
+            "source": "/tmp/airpods-pro-2.mp4",
+            "type": "Video"
+        },
+        "compactTrailing": {
+            "frame": {
+                "height": 17.5,
+                "width": 17.5
+            },
+            "padding": [
+                0,
+                8.25,
+                0,
+                5.25
+            ],
+            "progressViewStyle": "circular",
+            "tint": "#FF6366",
+            "type": "ProgressView",
+            "value": 0.2
+        },
+        "contentMargins": [
+            {
+                "edges": "leading",
+                "for": "compactLeading",
+                "length": 6
+            },
+            {
+                "edges": "trailing",
+                "for": "compactLeading",
+                "length": 0
+            },
+            {
+                "edges": "leading",
+                "for": "compactTrailing",
+                "length": 0
+            },
+            {
+                "edges": "trailing",
+                "for": "compactTrailing",
+                "length": 6
+            }
+        ],
+        "minimal": {
+            "padding": [
+                0,
+                0,
+                2,
+                -1
+            ],
+            "source": "/tmp/airpods-pro-2.mp4",
+            "type": "Video"
+        }
+    },
+    "video-80": {
+        "compactLeading": {
+            "padding": [
+                0,
+                0,
+                2,
+                -1
+            ],
+            "source": "/tmp/airpods-pro-2.mp4",
+            "type": "Video"
+        },
+        "compactTrailing": {
+            "frame": {
+                "height": 17.5,
+                "width": 17.5
+            },
+            "padding": [
+                0,
+                8.25,
+                0,
+                5.25
+            ],
+            "progressViewStyle": "circular",
+            "tint": "#7BF1A8",
+            "type": "ProgressView",
+            "value": 0.8
+        },
+        "contentMargins": [
+            {
+                "edges": "leading",
+                "for": "compactLeading",
+                "length": 6
+            },
+            {
+                "edges": "trailing",
+                "for": "compactLeading",
+                "length": 0
+            },
+            {
+                "edges": "leading",
+                "for": "compactTrailing",
+                "length": 0
+            },
+            {
+                "edges": "trailing",
+                "for": "compactTrailing",
+                "length": 6
+            }
+        ],
+        "minimal": {
+            "padding": [
+                0,
+                0,
+                2,
+                -1
+            ],
+            "source": "/tmp/airpods-pro-2.mp4",
+            "type": "Video"
+        }
+    },
+    "video-unknown": {
+        "compactLeading": {
+            "padding": [
+                0,
+                0,
+                2,
+                -1
+            ],
+            "source": "/tmp/airpods-pro-2.mp4",
+            "type": "Video"
+        },
+        "compactTrailing": {
+            "frame": {
+                "height": 17.5,
+                "width": 17.5
+            },
+            "padding": [
+                0,
+                8.25,
+                0,
+                5.25
+            ],
+            "progressViewStyle": "circular",
+            "tint": "#7BF1A8",
+            "type": "ProgressView",
+            "value": 0
+        },
+        "contentMargins": [
+            {
+                "edges": "leading",
+                "for": "compactLeading",
+                "length": 6
+            },
+            {
+                "edges": "trailing",
+                "for": "compactLeading",
+                "length": 0
+            },
+            {
+                "edges": "leading",
+                "for": "compactTrailing",
+                "length": 0
+            },
+            {
+                "edges": "trailing",
+                "for": "compactTrailing",
+                "length": 6
+            }
+        ],
+        "minimal": {
+            "padding": [
+                0,
+                0,
+                2,
+                -1
+            ],
+            "source": "/tmp/airpods-pro-2.mp4",
+            "type": "Video"
+        }
+    }
+}
