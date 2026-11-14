@@ -8,7 +8,8 @@ enum Media {
     static func island(
         for media: NowPlaying,
         start: Double,
-        application: String?
+        application: String?,
+        tint: ArtworkTint? = nil
     ) -> DynamicIsland {
         let interval = media.playing && media.duration > 0 ? [start, start + media.duration] : nil
         var bottom = stack(.hStack, spacing: 16, [
@@ -20,11 +21,11 @@ enum Media {
         return DynamicIsland(
             expanded: DynamicIsland.Expanded(
                 leading: player(media),
-                trailing: bars(media, width: 25, height: 28),
+                trailing: bars(media, width: 25, height: 28, tint),
                 bottom: bottom
             ),
             compactLeading: artwork(media, side: 24, radius: 6),
-            compactTrailing: bars(media, width: 18, height: 20),
+            compactTrailing: bars(media, width: 18, height: 20, tint),
             minimal: artwork(media, side: 24, radius: 6),
             contentMargins: [
                 DynamicIsland.ContentMargins(edges: "horizontal", length: 20, for: .expanded),
@@ -133,9 +134,10 @@ enum Media {
         return node
     }
 
-    private static func bars(_ media: NowPlaying, width: CGFloat, height: CGFloat) -> Node {
+    private static func bars(_ media: NowPlaying, width: CGFloat, height: CGFloat, _ tint: ArtworkTint?) -> Node {
         var node = Node(.audioBars)
         node.isActive = media.playing
+        node.gradient = tint?.gradient
         node.frame = Frame(width: width, height: height)
         return node
     }

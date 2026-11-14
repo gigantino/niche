@@ -31,6 +31,11 @@ struct TuningTests {
         #expect(AudioBands.audible == -120)
         #expect(AudioMeter.grace == 2)
         #expect(AudioMeterState.latencyInterval == 1)
+        #expect(ArtworkTint.leadingBrightness == 0.85)
+        #expect(ArtworkTint.trailingBrightness == 0.6)
+        #expect(ArtworkTint.saturation == 0.5...0.9)
+        #expect(ArtworkTint.leastColour == 0.01)
+        #expect(ArtworkTint.leastSecondHue == 0.15)
     }
 
     @Test func eachLifecycleChangeHasItsAnimation() {

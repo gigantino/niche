@@ -13,6 +13,7 @@ final class MediaActivity: BuiltInActivity {
     private var media: NowPlaying?
     private var anchor: Double?
     private var presented: JSONValue?
+    private var artworkTint: (path: String, tint: ArtworkTint?)?
     private var wake: Task<Void, Never>?
     private var panelOpen = false
     private weak var center: ActivityCenter?
@@ -102,11 +103,15 @@ final class MediaActivity: BuiltInActivity {
         let start = media.start(at: now, keeping: anchor)
         anchor = media.playing ? start : nil
 
+        if artworkTint?.path != media.artwork {
+            artworkTint = media.artwork.map { ($0, ArtworkTint(path: $0)) }
+        }
         let application = NSWorkspace.shared.urlForApplication(withBundleIdentifier: media.bundleIdentifier)
         let island = Media.island(
             for: media,
             start: start,
-            application: application?.absoluteString
+            application: application?.absoluteString,
+            tint: artworkTint?.tint
         )
 
         do {
