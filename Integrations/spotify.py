@@ -6,6 +6,7 @@ import time
 from niche import Niche, NicheClosed, NicheError
 
 GREEN = "#1ED760"
+PAUSE_GRACE = 5
 
 QUERY = """
 if application "Spotify" is not running then return ""
@@ -174,8 +175,13 @@ def main():
     niche.on_intent("spotify", handle)
 
     shown = None
+    played = None
     while True:
         current = read()
+        if current is not None and current["state"]["playing"]:
+            played = time.time()
+        elif current is not None and (played is None or time.time() - played > PAUSE_GRACE):
+            current = None
         try:
             if current is None and shown is not None:
                 niche.end("spotify", dismissalPolicy="immediate")
