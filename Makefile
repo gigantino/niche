@@ -14,7 +14,9 @@ app:
 	-cp Assets/AirPods/*.mp4 $(APP)/Contents/Resources/
 	mkdir -p $(APP)/Contents/Helpers
 	cp .build/release/NicheCLI $(APP)/Contents/Helpers/niche
+	cp .build/release/libNicheNowPlaying.dylib $(APP)/Contents/Helpers/
 	codesign --force --sign $(or $(SIGN_ID),-) $(APP)/Contents/Helpers/niche
+	codesign --force --sign $(or $(SIGN_ID),-) $(APP)/Contents/Helpers/libNicheNowPlaying.dylib
 	codesign --force --sign $(or $(SIGN_ID),-) $(APP)
 
 run: app
