@@ -10,7 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var server: Server?
     private var statusItem: NSStatusItem?
     private var monitors: [Any] = []
-    private let builtIns = BuiltInActivities.all()
+    private let builtIns = CommandLine.arguments.contains("--no-built-ins") ? [] : BuiltInActivities.all()
 
     override init() {
         model = NotchModel(center: center)

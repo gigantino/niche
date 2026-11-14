@@ -2,7 +2,7 @@ APP := build/Niche.app
 PANEL := build/verify/panel
 SIGN_ID ?= $(shell security find-identity -v -p codesigning | awk 'NR==1 && $$2 ~ /^[0-9A-F]+$$/ {print $$2}')
 
-.PHONY: app run install test golden verify baseline clean
+.PHONY: app run bare install test golden verify baseline clean
 
 app:
 	swift build -c release
@@ -19,7 +19,11 @@ app:
 
 run: app
 	-pkill -x Niche
-	open $(APP)
+	while pgrep -x Niche >/dev/null; do sleep 0.1; done
+	open $(APP) $(if $(ARGS),--args $(ARGS))
+
+bare:
+	$(MAKE) run ARGS=--no-built-ins
 
 install: app
 	mkdir -p $(HOME)/.local/bin
@@ -38,11 +42,11 @@ $(PANEL): Verify/panel.swift
 
 verify: $(PANEL)
 	swift test
-	$(MAKE) run
-	python3 Verify/scenes.py check
+	$(MAKE) bare
+	python3 Verify/scenes.py check; status=$$?; $(MAKE) run; exit $$status
 
-baseline: run $(PANEL)
-	python3 Verify/scenes.py record
+baseline: bare $(PANEL)
+	python3 Verify/scenes.py record; status=$$?; $(MAKE) run; exit $$status
 
 clean:
 	rm -rf .build build
