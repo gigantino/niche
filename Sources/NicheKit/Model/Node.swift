@@ -38,6 +38,7 @@ public struct Node: Codable, Equatable, Sendable {
     public var total: Double?
     public var progressViewStyle: String?
     public var tint: String?
+    public var gradient: [String]?
     public var buttonStyle: String?
     public var isActive: Bool?
     public var html: String?

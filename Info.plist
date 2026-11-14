@@ -22,6 +22,8 @@
     <true/>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>Niche shows your AirPods in the notch when they connect.</string>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>Niche listens to the sound your Mac plays so the bars in the notch move with the music. Nothing is recorded or stored.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

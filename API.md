@@ -143,7 +143,7 @@ Added on top, none of it required:
 - `"bound": true` in `request` to end the activity when the requesting connection closes
 - `"dynamicIsland"` in `update` to change parts of an activity's island
 - view `Slider` (`value` and `total`, or `timerInterval` to advance on its own; `intent`, `tint`): dragging or clicking it raises the intent with the chosen `value`. Apple has no slider in Live Activities.
-- views `Video` (`source`, looping and muted), `WebView` (`source` or `html`; `niche.send("name")` in the page raises an intent) and `AudioBars` (`isActive`, `tint`)
+- views `Video` (`source`, looping and muted), `WebView` (`source` or `html`; `niche.send("name")` in the page raises an intent) and `AudioBars` (`isActive`, `tint`, or `gradient` with two colours that run from the first bar to the last; six bars follow the sound the Mac plays, or a fixed animation when Niche may not listen to it)
 - `{"op":"haptic"}` to tap the trackpad
 
 ## Command

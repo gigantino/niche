@@ -95,8 +95,11 @@ struct NodeView: View {
         case .webView:
             WebNode(source: node.source, html: node.html) { actions.intent($0, nil, nil) }
         case .audioBars:
-            AudioBarsNode(active: node.isActive ?? true, color: Color(spec: node.tint) ?? foreground)
-                .frame(width: node.frame?.width ?? 16, height: node.frame?.height ?? 14)
+            AudioBarsNode(
+                active: node.isActive ?? true,
+                colors: node.gradient?.compactMap { Color(spec: $0) } ?? [Color(spec: node.tint) ?? foreground]
+            )
+            .frame(width: node.frame?.width ?? 16, height: node.frame?.height ?? 18)
         }
     }
 
