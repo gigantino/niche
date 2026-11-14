@@ -10,11 +10,11 @@ Niche is a personal macOS app that turns the MacBook notch into a Dynamic Island
 | `make test` | Runs the tests. Takes about 10 seconds. Needs no running app. |
 | `make run` | Builds the release app into `build/Niche.app` and relaunches it. |
 | `make install` | Builds the app and links the `niche` command into `~/.local/bin`. |
-| `make verify` | Runs the tests, relaunches the app, and compares a screenshot of every scene in `Verify/scenes.py` with `Verify/baseline`. |
-| `make baseline` | Relaunches the app and records a screenshot for each scene that has none. To record a scene again, delete its file in `Verify/baseline` first. |
+| `make verify` | Runs the tests, relaunches the app without its built-in activities, compares a screenshot of every scene in `Verify/scenes.py` with `Verify/baseline`, and relaunches the app normally. |
+| `make baseline` | Does the same relaunches and records a screenshot for each scene that has none. To record a scene again, delete its file in `Verify/baseline` first. |
 | `make golden` | Records `Verify/golden/` again from an in-process server and the built command. Needs no running app. |
 
-`make run`, `make verify`, and `make baseline` replace the app on the owner's real notch, so two agents cannot run them at the same time. Integrations exit when the app restarts. Start them again afterwards (`python3 Integrations/spotify.py &`). The scene script waits while the pointer is near the notch and stops if another activity is showing.
+`make run`, `make verify`, and `make baseline` replace the app on the owner's real notch, so two agents cannot run them at the same time. Integrations exit when the app restarts, so start any the owner was running again afterwards. The scene script waits while the pointer is near the notch and stops if another activity is showing. `make bare` launches the app with `--no-built-ins`, which is how the scene script gets an empty notch while music plays.
 
 ## Layout
 
@@ -27,12 +27,14 @@ Sources/NicheKit/        Everything a client can observe except pixels. No AppKi
 Sources/Niche/           The app. Pixels, pointer, built-in activities. Never parses a JSON line.
   Notch/                 NotchModel (what shows, pointer behaviour), geometry, panel, shape, layout
   Views/                 NodeView renders a Node. Kinds/ holds the larger view types. Styles.swift holds fonts and colours.
-  BuiltIn/               Activities that run inside the app, such as AirPods
-  System/                Haptics
+  BuiltIn/               Activities that run inside the app: AirPods and Media
+  System/                Haptics, full screen detection, the audio meter and its parts
+Sources/NicheNowPlaying/ A library that reads the system's Now Playing state. The app runs it inside /usr/bin/perl.
+Sources/NowPlayingWire/  The two types that cross between that library and the app: NowPlaying and NowPlayingRequest
 Sources/NicheCLI/        The niche command. Flags and shorthands become a Request.
 Integrations/            Python programs that use the socket. niche.py is the shared client.
 Tests/NicheKitTests/     Lifecycle, decoding, the protocol, command and Python client contracts, API.md coverage
-Tests/NicheTests/        Pointer behaviour with a fake pointer, the tuned delays, geometry, built-ins
+Tests/NicheTests/        Pointer behaviour with a fake pointer, the tuned delays, geometry, built-ins, media (MediaSupport.swift holds the fakes)
 Verify/                  The contract scripts, their golden files, the scenes, and the screenshot baseline
 ```
 
@@ -51,6 +53,7 @@ Verify/                  The contract scripts, their golden files, the scenes, a
 - The tinted outline (`keylineTint`) is left out on purpose. Do not add it.
 - QuartzNotch (GPLv3) is a reference for how features work. Never paste its code.
 - Look at a screenshot of any panel you build before you report it. Keep one left edge, and put the main content in the `bottom` region.
+- Keep the tests few. Test what a look at the notch cannot show and the numbers the owner tuned. Do not add a test for every branch, and do not add tests only to make a mutation check pass.
 - Commit messages have a conventional subject, a short body, and no co-author or session trailer.
 
 ## Add an external integration
@@ -63,19 +66,35 @@ Use this route unless the feature needs an API that only an app can call.
 4. Handle buttons with `niche.on_intent("<name>", handler)`. All handlers share one background thread, so a slow handler delays the next event. A handler may call `niche` again.
 5. A call raises `NicheError` with the server's message when the server refuses it, and `NicheClosed` when the app has quit. Decide what each means for your script. `niche.on_close(handler)` runs when the app goes away.
 
-`Integrations/spotify.py` shows the whole pattern. Check your integration with `niche activities`, then look at the notch.
+`Integrations/spotify.py` shows the whole pattern. It is an example only: the built-in Media activity already shows Spotify, so running both puts two players in the notch. Check your integration with `niche activities`, then look at the notch.
 
 A placeholder that is the whole string takes the value's type. `"text": "{{state.count}}"` fails when `count` is a number. Write `"text": "{{state.count}} left"`, or send the number as a string.
 
 ## Add a built-in activity
 
-1. Create a file in `Sources/Niche/BuiltIn/` with a class that conforms to `BuiltInActivity`.
+1. Create a file in `Sources/Niche/BuiltIn/` with a class that conforms to `BuiltInActivity`. `start(center:notch:)` gives it the activity center and the notch model.
 2. Add it to `BuiltInActivities.all()` in `Sources/Niche/BuiltIn/BuiltInActivity.swift`. Without that line it never starts, and `BuiltInActivitiesTests` fails.
 3. Build the island from typed values, so the compiler checks every field: `Node(.image) { $0.systemName = "calendar" }` inside a `DynamicIsland(…)`. Pass it as `JSONValue(encoding: island)`.
 4. Drive the activity only through `ActivityCenter.request`, `update`, and `end`. To react to its buttons, call `center.onIntent(for: id) { intent, isOn, value in … }`.
 5. Test the island builder in `Tests/NicheTests/`, as `AirPodsIslandTests` does.
 
-`BuiltIn/AirPods/` is the example.
+`BuiltIn/AirPods/` is the short example. `BuiltIn/Media/` is the long one.
+
+## Media
+
+The Media activity shows whatever the system reports as Now Playing, from any app: the artwork, the title, the controls the player supports, and a seek bar.
+
+- Since macOS 15.4 only Apple's own programs may read Now Playing. `NowPlayingMonitor` therefore starts `/usr/bin/perl`, which loads `libNicheNowPlaying.dylib` and runs it. The library writes one `NowPlaying` value as a JSON line for each change and reads one `NowPlayingRequest` as a JSON line for each command. Both types live in `NowPlayingWire`, so the compiler keeps the two sides in step.
+- `NowPlaying.Command` is the one list of commands. Its raw values are the intent names in the island and the names on the wire. `RemoteCommand` in the library holds the system's numbers for them.
+- `MediaVisibility` decides when the activity shows. It is one of three phases: idle, active (playing, or paused with its panel open), or paused since a time. Paused media leaves five seconds after the pause, or five seconds after its panel closes. It also hides while the player owns the full screen space on the notch display, which `FullScreen` reads from the window server.
+- `MediaActivity` is the only part with timers. It observes the panel through `notch.expanded` and keeps one timer for the end of the pause.
+- The controls are the ones Now Playing carries: previous, play or pause, next, and seek. Shuffle and repeat were built for Spotify through AppleScript and removed at the owner's request. Do not add player-specific controls unless the owner asks.
+- `ArtworkFetch` in the library holds the rules for artwork: wait for the first answer before writing a new item, write it without artwork after a miss, try again on later polls until five tries have failed, and give up on an answer that takes more than a second.
+- The bars follow the sound the Mac plays. `AudioMeter` is a lock around `AudioMeterState`, a value that holds every decision: when a tap is needed, when it may stop, which frame is due. `AudioTap` owns the Core Audio objects and closes them when it is released. `AudioAnalyzer` turns samples into bar frames: `AudioBands` reads six frequency bands and turns each band's level in decibels into a height on a straight line, and `AudioLevels` smooths the heights lightly. `LevelDelay` holds each frame back by the delay of the output device, so the bars match what the owner hears through Bluetooth. The tap runs while an active `AudioBars` view holds a `Listener`, and stops two seconds after the last one lets go. macOS asks the owner once for permission to capture system audio. Without it, or until the first sound is due, the bars show a fixed animation.
+- The six bands, the height lines, the smoothing, the bar shape and the two colours were fitted to a screen recording of an iPhone's Dynamic Island with its own audio. `TuningTests` pins them. Change them only when the owner asks.
+- `ArtworkTint` holds the two colours for the bars: the strongest hue of the artwork for the first bar and the second strongest, darker, for the last. It exists only when the cover has colour. Without it the bars are white.
+- `Media.island` builds the island from one `NowPlaying` value. It assigns fields one by one instead of nesting `Node(…) { }` closures, because the nested form crashes the release build of Swift 6.2 while the debug build and the tests pass. Run `swift build -c release` after you change it.
+- To check a change live, play something and look at the notch. `niche update media --alert x --sound pin-silent` opens the panel for four seconds without the pointer.
 
 ## Add a view type or a modifier
 
@@ -112,4 +131,7 @@ Haptics and the feel of the animation cannot be checked by a test. Say in your r
 - The command crashes on a number it cannot encode, such as `--relevanceScore nan`.
 - The pointer logic in `NotchModel` runs on several timers and is tested on the real clock with short delays. Rewriting it as one pure state machine would make those tests exact, but nothing can prove the feel is unchanged without a pointer trace recorded by the owner.
 - `AlertConfiguration.title` and `body` are accepted and not shown.
+- A player that reports no timestamp makes the library write a new line on every poll, so the seek bar does not advance for it. No such player has been seen.
+- If another program ends the `media` activity, it comes back only when the media changes.
+- The bars follow everything the Mac plays, not only the player in the notch. The seek bar assumes normal speed, so at another playback rate it drifts until the player reports its position again.
 - Not built: `ActivityStyle.transient`, Apple's limits (eight hours, payload size, activity count), file drop, starting integrations at login.
