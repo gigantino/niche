@@ -9,6 +9,15 @@ enum ImageCache {
         store.object(forKey: url.absoluteString as NSString)
     }
 
+    static func file(_ url: URL) -> NSImage? {
+        let modified = (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+        let key = "\(url.path)\n\(modified?.timeIntervalSince1970 ?? 0)" as NSString
+        if let image = store.object(forKey: key) { return image }
+        guard let data = try? Data(contentsOf: url), let image = NSImage(data: data) else { return nil }
+        store.setObject(image, forKey: key)
+        return image
+    }
+
     static func load(_ url: URL) async -> NSImage? {
         if let image = cached(url) { return image }
         guard let (data, _) = try? await URLSession.shared.data(from: url), let image = NSImage(data: data) else {

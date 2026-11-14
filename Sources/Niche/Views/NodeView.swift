@@ -190,7 +190,7 @@ struct NodeView: View {
         if let app = node.app, let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app) {
             return NSWorkspace.shared.icon(forFile: url.path)
         }
-        return fileURL.flatMap { NSImage(contentsOf: $0) }
+        return fileURL.flatMap(ImageCache.file)
     }
 
     private var fileURL: URL? {
