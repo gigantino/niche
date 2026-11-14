@@ -9,7 +9,7 @@ final class AirPodsActivity: BuiltInActivity {
     private var dismissal: Task<Void, Never>?
     private let log = Logger(subsystem: "ch.ggtn.niche", category: "airpods")
 
-    func start(center: ActivityCenter) {
+    func start(center: ActivityCenter, notch: NotchModel) {
         monitor.onConnect = { [weak self] in self?.show($0, in: center) }
         monitor.onBatteryChange = { airPods in
             guard let island = try? JSONValue(encoding: airPods.island) else { return }

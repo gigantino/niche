@@ -27,7 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         for builtIn in builtIns {
-            builtIn.start(center: center)
+            builtIn.start(center: center, notch: model)
         }
 
         let model = model
