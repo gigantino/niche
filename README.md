@@ -1,10 +1,12 @@
 # Niche
 
-Niche shows Live Activities in the notch of a MacBook. It is a Dynamic Island for macOS. Each program on the Mac can show an activity.
+Niche brings the Dynamic Island to the MacBook notch, a lot like [Alcove](https://tryalcove.com/) does.
+
+The difference is that Niche stays minimal on purpose. Instead of shipping a fixed set of features, it gives you an API to plug your own apps and scripts into the notch. The API is modelled on Apple's [Live Activities](https://developer.apple.com/design/human-interface-guidelines/live-activities), so if you know ActivityKit, you already know how it works.
 
 ## Requirements
 
-- A Mac that has a notch
+- A Mac with a notch
 - macOS 14 or later
 - Xcode
 
@@ -21,25 +23,6 @@ Niche shows Live Activities in the notch of a MacBook. It is a Dynamic Island fo
    ```sh
    make run
    ```
-
-## Make something for the notch
-
-Give this repository to your coding agent. Tell the agent what you want to see in the notch.
-
-Niche uses the names of the Live Activities API from Apple. The names come from ActivityKit and WidgetKit:
-
-- `request`, `update`, and `end`
-- `ActivityContent`
-- `DynamicIsland`, with `compactLeading`, `compactTrailing`, `minimal`, and `expanded`
-
-An agent that can write a Live Activity for iPhone can write one for Niche. The agent sends JSON through a local socket. The agent does not compile a widget.
-
-Give these instructions to the agent:
-
-1. Read `AGENTS.md`. This file has a procedure for each type of change.
-2. Read `API.md`. This file gives the Niche name for each Apple name.
-3. Use the names and the behavior of the Apple API.
-4. Run `make test`. All the tests must pass.
 
 ## Example
 
@@ -61,4 +44,4 @@ Give these instructions to the agent:
    niche end build
    ```
 
-`Integrations/spotify.py` is a full example. It shows a Spotify player with the cover, the controls, and a seek bar.
+[`Integrations/spotify.py`](Integrations/spotify.py) is a full example. It shows a Spotify player with the cover, the controls, and a seek bar.
