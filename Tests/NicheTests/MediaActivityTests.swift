@@ -16,6 +16,7 @@ struct MediaActivityTests {
     @MainActor
     final class Screen {
         var filled = false
+        var playsHere = true
     }
 
     init() {
@@ -24,6 +25,7 @@ struct MediaActivityTests {
         activity = MediaActivity(
             source: source,
             fillsScreen: { [screen] _ in screen.filled },
+            playsHere: { [screen] _ in screen.playsHere },
             visibility: MediaVisibility(pauseGrace: 0.15)
         )
         activity.start(center: center, notch: model)
@@ -84,6 +86,16 @@ struct MediaActivityTests {
         screen.filled = false
         activity.refresh()
         #expect(shown != nil)
+    }
+
+    @Test func mediaPlayingOnAnotherDeviceStaysAway() {
+        screen.playsHere = false
+        source.onChange?(now())
+        #expect(shown == nil)
+
+        screen.playsHere = true
+        activity.refresh()
+        #expect(shown?.island.compactTrailing?.isActive == true)
     }
 
     @Test func theButtonsReachThePlayer() {

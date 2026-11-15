@@ -6,9 +6,11 @@ import OSLog
 @MainActor
 final class MediaActivity: BuiltInActivity {
     static let id = "media"
+    static let recheckDelay: TimeInterval = 1
 
     private let source: any NowPlayingSource
     private let fillsScreen: (NowPlaying) -> Bool
+    private let playsHere: (NowPlaying) -> Bool
     private var visibility: MediaVisibility
     private var media: NowPlaying?
     private var anchor: Double?
@@ -29,10 +31,14 @@ final class MediaActivity: BuiltInActivity {
                 on: NSScreen.screens.first { $0.safeAreaInsets.top > 0 }
             )
         },
+        playsHere: @escaping (NowPlaying) -> Bool = { media in
+            AudioOutput.isPlaying(pid: media.pid, bundleIdentifier: media.bundleIdentifier)
+        },
         visibility: MediaVisibility = MediaVisibility()
     ) {
         self.source = source
         self.fillsScreen = fillsScreen
+        self.playsHere = playsHere
         self.visibility = visibility
     }
 
@@ -61,16 +67,21 @@ final class MediaActivity: BuiltInActivity {
         wake?.cancel()
         let now = Date()
 
-        let fillsScreen = media.map(fillsScreen) ?? false
-        guard visibility.shows(media, fillsScreen: fillsScreen, expanded: isExpanded, at: now), let media else {
-            hide()
-            return
-        }
-        show(media, at: now)
+        var media = media
+        let elsewhere = media.map { $0.playing && !playsHere($0) } ?? false
+        if elsewhere { media?.playing = false }
 
-        guard let deadline = visibility.deadline else { return }
+        let fillsScreen = media.map(fillsScreen) ?? false
+        if visibility.shows(media, fillsScreen: fillsScreen, expanded: isExpanded, at: now), let media {
+            show(media, at: now)
+        } else {
+            hide()
+        }
+
+        let recheck = elsewhere ? now.addingTimeInterval(Self.recheckDelay) : nil
+        guard let next = [visibility.deadline, recheck].compactMap({ $0 }).min() else { return }
         wake = Task {
-            try? await Task.sleep(for: .seconds(deadline.timeIntervalSince(now) + 0.02))
+            try? await Task.sleep(for: .seconds(next.timeIntervalSince(now) + 0.02))
             guard !Task.isCancelled else { return }
             refresh()
         }
