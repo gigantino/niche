@@ -51,7 +51,7 @@ final class AudioMeter: Sendable {
 
     private func start() {
         guard session.withLock({ $0.state.needsTap }) else { return }
-        guard let tap = AudioTap(queue: queue, receive: { [weak self] in self?.receive($0) }) else {
+        guard let tap = AudioTap(receive: { [weak self] in self?.receive($0) }) else {
             log.error("the audio tap could not be started")
             return
         }

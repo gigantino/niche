@@ -8,7 +8,7 @@ final class AudioTap: Sendable {
     private let device: AudioObjectID
     private let procedure: AudioDeviceIOProcID
 
-    init?(queue: DispatchQueue, receive: @escaping @Sendable ([Float]) -> Void) {
+    init?(receive: @escaping @Sendable ([Float]) -> Void) {
         guard #available(macOS 14.2, *) else { return nil }
 
         let description = CATapDescription(monoGlobalTapButExcludeProcesses: [])
@@ -40,6 +40,7 @@ final class AudioTap: Sendable {
                 kAudioSubTapDriftCompensationKey: true
             ]]
         ]
+        let queue = DispatchQueue(label: "ch.ggtn.niche.audio.io", qos: .userInteractive)
         var device = AudioObjectID(kAudioObjectUnknown)
         var procedure: AudioDeviceIOProcID?
         guard AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &device) == noErr,
