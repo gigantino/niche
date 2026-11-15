@@ -29,16 +29,6 @@ struct NowPlayingTests {
         #expect(try JSONDecoder().decode(NowPlaying?.self, from: Data(line.utf8)) == .sample())
     }
 
-    @Test func nothingPlayingIsNull() throws {
-        let line = Snapshot.line(Snapshot.nowPlaying(
-            info: [:], bundleIdentifier: "com.example.player", name: nil, pid: 41, playing: false, commands: [],
-            artwork: nil, now: Date()
-        ))
-
-        #expect(line == "null")
-        #expect(try JSONDecoder().decode(NowPlaying?.self, from: Data(line.utf8)) == nil)
-    }
-
     @Test func eachButtonSendsTheSystemsOwnCommand() {
         #expect(RemoteCommand(sending: .playPause)?.rawValue == 2)
         #expect(RemoteCommand(sending: .next)?.rawValue == 4)

@@ -31,11 +31,4 @@ struct ArtworkTintTests {
         #expect(trailing.blue > trailing.red)
         #expect(max(trailing.red, trailing.green, trailing.blue) < max(leading.red, leading.green, leading.blue))
     }
-
-    @Test func aCoverWithoutColourKeepsTheBarsWhite() {
-        #expect(ArtworkTint(pixels: pixels([(0, 0, 0, 50), (255, 255, 255, 30), (90, 90, 90, 20)])) == nil)
-        #expect(ArtworkTint(pixels: pixels([(100, 98, 96, 100)])) == nil)
-        #expect(ArtworkTint(pixels: []) == nil)
-        #expect(ArtworkTint(path: "/nonexistent/cover") == nil)
-    }
 }

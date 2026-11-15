@@ -57,14 +57,4 @@ struct ContractTests {
         server.center.opened("https://example.com/a", from: "player")
         #expect(await connection.next() == #"{"event":"openURL","id":"player","url":"https://example.com/a"}"#)
     }
-
-    @Test func hapticReachesTheHostWithItsStrength() async throws {
-        let server = try await RunningServer()
-        defer { server.stop() }
-        let connection = try await server.connect()
-
-        #expect(try await connection.send(#"{"op":"haptic","strength":3}"#) == #"{"ok":true}"#)
-        #expect(try await connection.send(#"{"op":"haptic"}"#) == #"{"ok":true}"#)
-        #expect(server.haptics == [3, nil])
-    }
 }

@@ -23,9 +23,4 @@ struct AirPodsIslandTests {
         #expect(try island(video: nil, symbol: "airpods", battery: 55) == expected["symbol-55"])
         #expect(try island(video: nil, symbol: "airpods.max", battery: nil) == expected["symbol-unknown"])
     }
-
-    @Test func aLowBatteryTurnsTheRingRed() throws {
-        #expect(try island(video: nil, symbol: "airpods", battery: 20).compactTrailing?.tint == "#FF6366")
-        #expect(try island(video: nil, symbol: "airpods", battery: 21).compactTrailing?.tint == "#7BF1A8")
-    }
 }

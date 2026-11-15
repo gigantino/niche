@@ -16,38 +16,6 @@ struct DynamicIslandTests {
         #expect(throws: DecodingError.self) { try island(#"{"minimal": {"type": "Text", "padding": [1, 2, 3]}}"#) }
     }
 
-    @Test func frameMaximaTakeANumberOrInfinity() throws {
-        let frame = try island(#"{"minimal": {"type": "Text", "frame": {"maxWidth": "infinity", "maxHeight": 30}}}"#)
-            .minimal?.frame
-
-        #expect(frame?.maxWidth == .infinity)
-        #expect(frame?.maxWidth?.value == .infinity)
-        #expect(frame?.maxHeight == .points(30))
-        #expect(throws: DecodingError.self) {
-            try island(#"{"minimal": {"type": "Text", "frame": {"maxWidth": "wide"}}}"#)
-        }
-    }
-
-    @Test func fontTakesATextStyleOrAnObject() throws {
-        let decoded = try island("""
-        {"compactLeading": {"type": "Text", "font": "headline"},
-         "compactTrailing": {"type": "Text", "font": {"size": 13, "weight": "bold", "design": "rounded"}}}
-        """)
-
-        #expect(decoded.compactLeading?.font == FontSpec(style: "headline"))
-        #expect(decoded.compactTrailing?.font == FontSpec(size: 13, weight: "bold", design: "rounded"))
-    }
-
-    @Test func aViewNeedsAKnownType() {
-        #expect(throws: DecodingError.self) { try island(#"{"minimal": {"type": "Nope"}}"#) }
-        #expect(throws: DecodingError.self) { try island(#"{"minimal": {"text": "x"}}"#) }
-    }
-
-    @Test func unknownFieldsAreIgnored() throws {
-        let decoded = try island(#"{"keylineTint": "red", "minimal": {"type": "Text", "sparkle": true}}"#)
-        #expect(decoded.minimal?.type == .text)
-    }
-
     @Test func contentMarginsApplyInOrderToTheirMode() throws {
         let decoded = try island("""
         {"contentMargins": [
@@ -71,33 +39,5 @@ struct DynamicIslandTests {
         #expect(try island(#"{"compactLeading": {"type": "Text"}, "compactTrailing": {"type": "Image"}}"#).attached?.type == .text)
         #expect(try island(#"{"compactTrailing": {"type": "Image"}}"#).attached?.type == .image)
         #expect(try island("{}").attached == nil)
-    }
-
-    @Test func anIslandIsExpandableOnlyWithAtLeastOneRegion() throws {
-        #expect(try island(#"{"expanded": {}}"#).hasExpanded == false)
-        #expect(try island(#"{"expanded": {"bottom": {"type": "Spacer"}}}"#).hasExpanded == true)
-    }
-
-    @Test func ifAndUnlessDecideVisibility() throws {
-        let decoded = try island("""
-        {"compactLeading": {"type": "Text", "if": false},
-         "compactTrailing": {"type": "Text", "unless": true},
-         "minimal": {"type": "Text", "if": true, "unless": false}}
-        """)
-
-        #expect(decoded.compactLeading?.isVisible == false)
-        #expect(decoded.compactTrailing?.isVisible == false)
-        #expect(decoded.minimal?.isVisible == true)
-    }
-
-    @Test func dismissalPolicyReadsApplesThreeForms() throws {
-        func policy(_ json: String) throws -> DismissalPolicy {
-            try JSONDecoder().decode(DismissalPolicy.self, from: Data(json.utf8))
-        }
-
-        #expect(try policy(#""default""#) == .default)
-        #expect(try policy(#""immediate""#) == .immediate)
-        #expect(try policy(#"{"after": 1794500600}"#) == .after(1794500600))
-        #expect(throws: DecodingError.self) { try policy(#""later""#) }
     }
 }

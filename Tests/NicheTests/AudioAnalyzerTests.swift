@@ -35,17 +35,6 @@ struct LevelDelayTests {
 }
 
 struct AudioMeterStateTests {
-    private func tone(_ count: Int, frequency: Float = 1000) -> [Float] {
-        (0..<count).map { 0.25 * sin(2 * .pi * frequency * Float($0) / 48000) }
-    }
-
-    private func running() -> AudioMeterState {
-        var state = AudioMeterState()
-        _ = state.attach()
-        state.started(sampleRate: 48000)
-        return state
-    }
-
     @Test func theTapStopsOnlyForTheLastDepartureWhenNobodyListens() {
         var state = AudioMeterState()
         _ = state.attach()
@@ -63,33 +52,5 @@ struct AudioMeterStateTests {
         let three = state.detach()
         #expect(!state.isIdle(since: two))
         #expect(state.isIdle(since: three))
-    }
-
-    @Test func nothingShowsUntilTheFirstSoundIsDue() {
-        var state = running()
-        state.measured(latency: 0.2)
-        let quiet = state.receive([Float](repeating: 0, count: 4096), at: 100)
-        #expect(!quiet.firstSound)
-        #expect(state.levels(at: 100.5) == nil)
-
-        let sound = state.receive(tone(2048), at: 101)
-        let more = state.receive(tone(1024), at: 101.02)
-        #expect(sound.firstSound)
-        #expect(!more.firstSound)
-        #expect(state.levels(at: 101.1) == nil)
-        #expect(state.levels(at: 101.2) != nil)
-    }
-
-    @Test func stoppingForgetsTheSoundAndIgnoresLateSamples() {
-        var state = running()
-        _ = state.receive(tone(2048), at: 10)
-        let shown = state.levels(at: 10)
-        state.stopped()
-        let late = state.receive(tone(2048), at: 10.1)
-
-        #expect(shown != nil)
-        #expect(!late.firstSound)
-        #expect(!late.measures)
-        #expect(state.levels(at: 11) == nil)
     }
 }

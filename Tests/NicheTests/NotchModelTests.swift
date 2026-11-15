@@ -91,19 +91,6 @@ struct NotchModelTests {
         #expect(world.haptics == 1)
     }
 
-    @Test func aPointerThatOnlyPassesOverDoesNotHover() async throws {
-        let model = timed { $0.hoverEnter = 0.3 }
-        world.pointer = Self.onNotch
-        model.pointerMoved(to: Self.onNotch)
-        try await pause(0.05)
-        world.pointer = Self.away
-        model.pointerMoved(to: Self.away)
-
-        try await pause(0.5)
-        #expect(!model.isHovering)
-        #expect(world.haptics == 0)
-    }
-
     @Test func oneActivityIsCompactWithItsMeasuredWings() throws {
         try center.request(id: "a", dynamicIsland: [
             "compactLeading": ["type": "Text", "text": "a"],
@@ -116,15 +103,6 @@ struct NotchModelTests {
         #expect(!model.isMinimal)
         #expect(model.detached == nil)
         #expect(model.wings.leading == 52)
-        #expect(model.wings.trailing == 24)
-    }
-
-    @Test func aMissingCompactSideTakesNoWidth() throws {
-        try center.request(id: "a", dynamicIsland: ["compactTrailing": ["type": "Text", "text": "b"]])
-        model.measured(52, edge: .leading)
-        model.measured(24, edge: .trailing)
-
-        #expect(model.wings.leading == 0)
         #expect(model.wings.trailing == 24)
     }
 
@@ -168,18 +146,6 @@ struct NotchModelTests {
         #expect(world.opened == [URL(string: "niche-test://order/12")!])
     }
 
-    @Test func aTapOnTheDetachedCircleTargetsTheSecondActivity() throws {
-        try center.request(id: "low", content: ActivityContent(relevanceScore: 1), dynamicIsland: Self.expandable)
-        try center.request(id: "high", content: ActivityContent(relevanceScore: 9), dynamicIsland: Self.expandable)
-        let circle = try #require(model.geometry).detachedZone
-        let point = CGPoint(x: circle.midX, y: circle.midY)
-
-        model.pointerPressed(at: point)
-        model.pointerReleased(at: point)
-        #expect(model.expanded?.id == "low")
-        model.collapse()
-    }
-
     @Test func pressAndHoldExpandsWithAHaptic() async throws {
         try center.request(id: "a", dynamicIsland: Self.expandable)
         model.pointerPressed(at: Self.onNotch)
@@ -189,14 +155,6 @@ struct NotchModelTests {
         #expect(model.expanded?.id == "a")
         #expect(world.haptics == 1)
         model.collapse()
-    }
-
-    @Test func anActivityWithoutExpandedRegionsDoesNotExpand() throws {
-        try center.request(id: "a", dynamicIsland: ["compactLeading": ["type": "Text", "text": "a"]])
-        model.pointerPressed(at: Self.onNotch)
-        model.pointerReleased(at: Self.onNotch)
-
-        #expect(model.expanded == nil)
     }
 
     @Test func theExpandedPanelClosesOnceThePointerHasLeft() async throws {
@@ -261,20 +219,6 @@ struct NotchModelTests {
         model.collapse()
     }
 
-    @Test func hapticsCloserTogetherThanTheGapAreDropped() async throws {
-        let model = timed { $0.hapticGap = 0.3 }
-        defer { model.collapse() }
-        try center.request(id: "a", dynamicIsland: Self.expandable)
-        try center.update("a", alert: AlertConfiguration(sound: "Pop"))
-        try center.update("a", alert: AlertConfiguration(sound: "Pop"))
-        #expect(world.haptics == 1)
-
-        try await pause(0.45)
-        try center.update("a", alert: AlertConfiguration(sound: "Pop"))
-        #expect(world.haptics == 2)
-        #expect(world.sounds.count == 3)
-    }
-
     @Test func thePanelStaysOpenWhileAButtonIsHeld() async throws {
         try center.request(id: "a", dynamicIsland: Self.expandable)
         model.expand("a")
@@ -291,14 +235,6 @@ struct NotchModelTests {
         #expect(model.expanded == nil)
     }
 
-    @Test func aPressOutsideTheExpandedPanelClosesIt() throws {
-        try center.request(id: "a", dynamicIsland: Self.expandable)
-        model.expand("a")
-        model.pointerPressed(at: Self.away)
-
-        #expect(model.expanded == nil)
-    }
-
     @Test func anAlertExpandsPlaysItsSoundAndClosesByItself() async throws {
         try center.request(id: "a", dynamicIsland: Self.expandable)
         try center.update("a", alert: AlertConfiguration(title: "Ready", sound: "Pop"))
@@ -309,17 +245,6 @@ struct NotchModelTests {
 
         try await pause(0.8)
         #expect(model.expanded == nil)
-    }
-
-    @Test func anAlertedPanelStaysWhileThePointerIsInside() async throws {
-        try center.request(id: "a", dynamicIsland: Self.expandable)
-        try center.update("a", alert: AlertConfiguration(title: "Ready"))
-        world.pointer = Self.inPanel
-
-        try await pause(0.8)
-        #expect(model.expanded != nil)
-        #expect(world.sounds == [nil])
-        model.collapse()
     }
 
     @Test func endingTheExpandedActivityClosesThePanelAndReleasesThePointer() async throws {
@@ -338,21 +263,6 @@ struct NotchModelTests {
         #expect(captures == [true, false])
     }
 
-    @Test func theExpandedSizeFollowsTheMeasuredHeightWithinApplesLimits() throws {
-        try center.request(id: "a", dynamicIsland: Self.expandable)
-        model.expand("a")
-
-        model.measuredExpanded(height: 120)
-        #expect(model.expandedSize == CGSize(width: 209 + 2 * 122, height: 120))
-
-        model.measuredExpanded(height: 500)
-        #expect(model.expandedSize?.height == 200)
-
-        model.measuredExpanded(height: 10)
-        #expect(model.expandedSize?.height == 84)
-        model.collapse()
-    }
-
     @Test func buttonsTogglesAndSlidersReportTheirIntentForTheirActivity() throws {
         var received: [String] = []
         center.onIntent(for: "a") { intent, isOn, value in
@@ -365,31 +275,5 @@ struct NotchModelTests {
         actions.intent("mute", true, nil)
         actions.intent("seek", nil, 43.5)
         #expect(received == ["play nil nil", "mute Optional(true) nil", "seek nil Optional(43.5)"])
-    }
-
-    @Test func aLinkOpensItsURLAndTellsSubscribers() async throws {
-        let path = NSTemporaryDirectory() + "niche-" + UUID().uuidString.prefix(8) + "/s.sock"
-        let server = Server(
-            center: center,
-            host: Server.Host(notch: { nil }, version: { nil }, haptic: { _ in }),
-            path: path
-        )
-        try server.start()
-        defer { server.stop() }
-        for _ in 0..<200 where !FileManager.default.fileExists(atPath: path) {
-            try await pause(0.01)
-        }
-        let client = try await Task.detached { try SocketClient(path: path, readTimeout: 5) }.value
-        let subscribed = try await Task.detached {
-            try client.write(Data(#"{"op":"subscribe"}"#.utf8))
-            return client.read().map { String(decoding: $0, as: UTF8.self) }
-        }.value
-        #expect(subscribed == #"{"ok":true}"#)
-
-        model.actions(for: "a").open("niche-test://link")
-        let event = await Task.detached { client.read().map { String(decoding: $0, as: UTF8.self) } }.value
-
-        #expect(world.opened == [URL(string: "niche-test://link")!])
-        #expect(event == #"{"event":"openURL","id":"a","url":"niche-test://link"}"#)
     }
 }

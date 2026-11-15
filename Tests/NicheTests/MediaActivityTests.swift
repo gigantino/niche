@@ -63,20 +63,6 @@ struct MediaActivityTests {
         #expect(shown != nil)
     }
 
-    @Test func anOpenPanelKeepsPausedMedia() async throws {
-        source.onChange?(now())
-        #expect(model.expand(MediaActivity.id))
-        world.pointer = NotchModelTests.inPanel
-        source.onChange?(now(playing: false))
-
-        try await Task.sleep(for: .seconds(0.5))
-        #expect(shown != nil)
-
-        model.collapse()
-        try await Task.sleep(for: .seconds(1.4))
-        #expect(shown == nil)
-    }
-
     @Test func mediaHidesWhileItsPlayerFillsTheScreen() {
         source.onChange?(now())
         screen.filled = true

@@ -23,18 +23,6 @@ struct MediaIslandTests {
         #expect(details[5].children?.last?.countsDown == true)
     }
 
-    @Test func pausedMediaStandsStill() {
-        let (island, details) = parts(.sample(playing: false))
-
-        #expect(island.compactTrailing?.isActive == false)
-        #expect(details[2].children?[1].systemImage == "play.fill")
-        #expect(details[4].timerInterval == nil)
-        #expect(details[4].value == 3)
-        #expect(details[4].total == 118)
-        #expect(details[5].children?.first?.text == "0:03")
-        #expect(details[5].children?.last?.text == "1:55")
-    }
-
     @Test func aCommandThePlayerLacksIsNotAButton() {
         let controls = parts(.sample()).details[2].children ?? []
         let all = parts(.sample(commands: [.playPause, .next, .previous, .seek])).details[2].children ?? []

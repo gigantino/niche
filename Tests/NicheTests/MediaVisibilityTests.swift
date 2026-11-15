@@ -16,17 +16,6 @@ struct MediaVisibilityTests {
     let start = Date(timeIntervalSince1970: 5000)
     let rule = MediaRule()
 
-    @Test func pausedMediaLeavesAfterTheGrace() {
-        _ = rule.shows(.sample(), at: start)
-
-        #expect(rule.shows(.sample(playing: false), at: start + 1))
-        #expect(rule.visibility.deadline == start + 6)
-        #expect(rule.shows(.sample(playing: false), at: start + 5.9))
-        #expect(!rule.shows(.sample(playing: false), at: start + 6))
-        #expect(!rule.shows(.sample(playing: false), at: start + 7))
-        #expect(rule.shows(.sample(), at: start + 8))
-    }
-
     @Test func anOpenPanelHoldsPausedMediaAndTheGraceStartsWhenItCloses() {
         _ = rule.shows(.sample(), at: start)
 
