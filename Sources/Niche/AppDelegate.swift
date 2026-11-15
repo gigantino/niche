@@ -103,10 +103,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func installStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.button?.image = NSImage(
-            systemSymbolName: "rectangle.topthird.inset.filled",
-            accessibilityDescription: "Niche"
-        )
+        item.button?.image = MenuBarIcon.image
 
         let menu = NSMenu()
         menu.addItem(withTitle: "Quit Niche", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")

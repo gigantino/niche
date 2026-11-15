@@ -1,3 +1,5 @@
+<p align="center"><img src="Icon/Niche.png" width="160" alt="Niche icon"></p>
+
 # Niche
 
 Niche brings the Dynamic Island to the MacBook notch, a lot like [Alcove](https://tryalcove.com/) does.

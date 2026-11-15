@@ -2,7 +2,7 @@ APP := build/Niche.app
 PANEL := build/verify/panel
 SIGN_ID ?= $(shell security find-identity -v -p codesigning | awk 'NR==1 && $$2 ~ /^[0-9A-F]+$$/ {print $$2}')
 
-.PHONY: app run bare install test golden verify baseline clean
+.PHONY: app icon run bare install test golden verify baseline clean
 
 app:
 	swift build -c release
@@ -11,6 +11,7 @@ app:
 	cp .build/release/Niche $(APP)/Contents/MacOS/Niche
 	cp Info.plist $(APP)/Contents/Info.plist
 	mkdir -p $(APP)/Contents/Resources
+	cp Icon/Niche.icns $(APP)/Contents/Resources/
 	-cp Assets/AirPods/*.mp4 $(APP)/Contents/Resources/
 	mkdir -p $(APP)/Contents/Helpers
 	cp .build/release/NicheCLI $(APP)/Contents/Helpers/niche
@@ -18,6 +19,14 @@ app:
 	codesign --force --sign $(or $(SIGN_ID),-) $(APP)/Contents/Helpers/niche
 	codesign --force --sign $(or $(SIGN_ID),-) $(APP)/Contents/Helpers/libNicheNowPlaying.dylib
 	codesign --force --sign $(or $(SIGN_ID),-) $(APP)
+
+icon:
+	mkdir -p build/Niche.iconset
+	for size in 16 32 128 256 512; do \
+		rsvg-convert -w $$size Icon/Niche.svg -o build/Niche.iconset/icon_$${size}x$${size}.png; \
+		rsvg-convert -w $$((size * 2)) Icon/Niche.svg -o build/Niche.iconset/icon_$${size}x$${size}@2x.png; \
+	done
+	iconutil -c icns build/Niche.iconset -o Icon/Niche.icns
 
 run: app
 	-pkill -x Niche

@@ -10,6 +10,8 @@
     <string>ch.ggtn.niche</string>
     <key>CFBundleExecutable</key>
     <string>Niche</string>
+    <key>CFBundleIconFile</key>
+    <string>Niche</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

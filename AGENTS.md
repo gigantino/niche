@@ -12,6 +12,7 @@ Niche is a personal macOS app that turns the MacBook notch into a Dynamic Island
 | `make install` | Builds the app and links the `niche` command into `~/.local/bin`. |
 | `make verify` | Runs the tests, relaunches the app without its built-in activities, compares a screenshot of every scene in `Verify/scenes.py` with `Verify/baseline`, and relaunches the app normally. |
 | `make baseline` | Does the same relaunches and records a screenshot for each scene that has none. To record a scene again, delete its file in `Verify/baseline` first. |
+| `make icon` | Draws `Icon/Niche.icns` again from `Icon/Niche.svg`. Needs `rsvg-convert`. The app bundle copies the committed `.icns`. |
 | `make golden` | Records `Verify/golden/` again from an in-process server and the built command. Needs no running app. |
 
 `make run`, `make verify`, and `make baseline` replace the app on the owner's real notch, so two agents cannot run them at the same time. Integrations exit when the app restarts, so start any the owner was running again afterwards. The scene script waits while the pointer is near the notch and stops if another activity is showing. `make bare` launches the app with `--no-built-ins`, which is how the scene script gets an empty notch while music plays.
@@ -33,6 +34,7 @@ Sources/NicheNowPlaying/ A library that reads the system's Now Playing state. Th
 Sources/NowPlayingWire/  The two types that cross between that library and the app: NowPlaying and NowPlayingRequest
 Sources/NicheCLI/        The niche command. Flags and shorthands become a Request.
 Integrations/            Python programs that use the socket. niche.py is the shared client.
+Icon/                    The app icon: Niche.svg is the source, Niche.icns and Niche.png are drawn from it
 Tests/NicheKitTests/     Lifecycle, decoding, the protocol, command and Python client contracts, API.md coverage
 Tests/NicheTests/        Pointer behaviour with a fake pointer, the tuned delays, geometry, built-ins, media (MediaSupport.swift holds the fakes)
 Verify/                  The contract scripts, their golden files, the scenes, and the screenshot baseline
